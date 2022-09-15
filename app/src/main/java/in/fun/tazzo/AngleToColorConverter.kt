@@ -1,32 +1,25 @@
 package `in`.`fun`.tazzo
 
-import android.graphics.Color
-import io.reactivex.rxjava3.core.Observable
+import androidx.compose.ui.graphics.Color
+
 
 class AngleToColorConverter(
   private val baseColor: Color,
-  private val gyroReader: Observable<Int>
+  private val gyroReader: Int,
 ) {
 
-  private fun getRedRadiumColor(angle: Int): Float {
-    return baseColor.red() * (angle/360f)
+  private fun getRadiumColor(angle: Int, color: Float): Float {
+    val factor = angle.toFloat() / 360f
+    val newColor = if(color * factor * 100 > 1) color else color * factor * 100
+    return if (factor > 0.0) newColor else color
   }
 
-  private fun getGreenRadiumColor(angle: Int): Float {
-    return baseColor.green() * (angle/360f)
-  }
-
-  private fun getBlueRadiumColor(angle: Int): Float {
-    return baseColor.blue() * (angle/360f)
-  }
-
-  fun convert(): Observable<Color> {
-    return gyroReader.map { angle ->
-      Color.valueOf(
-        getRedRadiumColor(angle = angle),
-        getGreenRadiumColor(angle = angle),
-        getBlueRadiumColor(angle = angle)
-      )
-    }
+  fun convert(): Color {
+    val angle = gyroReader
+    return Color(
+      getRadiumColor(angle = angle, color = baseColor.red),
+      getRadiumColor(angle = angle, color = baseColor.green),
+      getRadiumColor(angle = angle, color = baseColor.blue)
+    )
   }
 }
